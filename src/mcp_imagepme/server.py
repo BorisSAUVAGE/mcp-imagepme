@@ -37,13 +37,22 @@ async def get_indicateurs_tva(
             ("T1".."T4") si trimestrielle.
         niveau_sectoriel: "ape", "classe", "groupe", "division", "section"
             ou "tous" (défaut).
-        secteur: libellé du secteur précis, requis si niveau_sectoriel != "tous".
+        secteur: secteur précis, requis si niveau_sectoriel != "tous". Pas
+            besoin du libellé exact du site : un mot-clé ("Boulangerie"), un
+            code NAF ("10.71C") ou un libellé complet fonctionnent tous.
         niveau_geo: "national" (défaut), "region" ou "departement".
-        territoire: nom de la région/du département, requis si niveau_geo != "national".
+        territoire: nom de la région/du département (ex. "Bretagne"),
+            requis si niveau_geo != "national". Mêmes tolérances que secteur.
         format: "excel" (défaut) ou "pdf".
 
     Returns:
         Le chemin local du fichier téléchargé.
+
+    Raises:
+        Une erreur explicite si le secteur/territoire ne correspond à aucune
+        option, ou si ImagePME refuse d'afficher un résultat pour cause de
+        secret statistique (échantillon trop petit) — dans ce dernier cas,
+        réessaie avec un niveau géographique ou sectoriel plus large.
     """
     download = download_tva_pdf if format == "pdf" else download_tva_excel
     # Playwright est utilisé en mode synchrone, incompatible avec la boucle
@@ -77,13 +86,22 @@ async def get_indicateurs_tdfc(
             (défaut : toutes tranches confondues).
         niveau_sectoriel: "ape", "classe", "groupe", "division", "section"
             ou "tous" (défaut).
-        secteur: libellé du secteur précis, requis si niveau_sectoriel != "tous".
+        secteur: secteur précis, requis si niveau_sectoriel != "tous". Pas
+            besoin du libellé exact du site : un mot-clé ("Boulangerie"), un
+            code NAF ("10.71C") ou un libellé complet fonctionnent tous.
         niveau_geo: "national" (défaut), "region" ou "departement".
-        territoire: nom de la région/du département, requis si niveau_geo != "national".
+        territoire: nom de la région/du département (ex. "Bretagne"),
+            requis si niveau_geo != "national". Mêmes tolérances que secteur.
         format: "excel" (défaut) ou "pdf".
 
     Returns:
         Le chemin local du fichier téléchargé.
+
+    Raises:
+        Une erreur explicite si le secteur/territoire ne correspond à aucune
+        option, ou si ImagePME refuse d'afficher un résultat pour cause de
+        secret statistique (échantillon trop petit) — dans ce dernier cas,
+        réessaie avec un niveau géographique ou sectoriel plus large.
     """
     download = download_tdfc_pdf if format == "pdf" else download_tdfc_excel
     path = await asyncio.to_thread(
