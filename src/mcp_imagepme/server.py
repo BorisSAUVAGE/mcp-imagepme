@@ -11,8 +11,8 @@ import asyncio
 
 from mcp.server.fastmcp import FastMCP
 
-from .reports.tdfc import TRANCHE_CA_TOUTES, download_tdfc_excel
-from .reports.tva import download_tva_excel
+from .reports.tdfc import TRANCHE_CA_TOUTES, download_tdfc_excel, download_tdfc_pdf
+from .reports.tva import download_tva_excel, download_tva_pdf
 
 mcp = FastMCP("imagepme")
 
@@ -26,8 +26,9 @@ async def get_indicateurs_tva(
     secteur: str | None = None,
     niveau_geo: str = "national",
     territoire: str | None = None,
+    format: str = "excel",
 ) -> str:
-    """Télécharge le fichier Excel des indicateurs TVA (ICA/ICAC) d'ImagePME.
+    """Télécharge les indicateurs TVA (ICA/ICAC) d'ImagePME.
 
     Args:
         periodicite: "mensuelle" ou "trimestrielle".
@@ -39,14 +40,16 @@ async def get_indicateurs_tva(
         secteur: libellé du secteur précis, requis si niveau_sectoriel != "tous".
         niveau_geo: "national" (défaut), "region" ou "departement".
         territoire: nom de la région/du département, requis si niveau_geo != "national".
+        format: "excel" (défaut) ou "pdf".
 
     Returns:
-        Le chemin local du fichier Excel téléchargé.
+        Le chemin local du fichier téléchargé.
     """
-    # download_tva_excel utilise Playwright en mode synchrone, incompatible
-    # avec la boucle asyncio du serveur MCP : on l'exécute dans un thread à part.
+    download = download_tva_pdf if format == "pdf" else download_tva_excel
+    # Playwright est utilisé en mode synchrone, incompatible avec la boucle
+    # asyncio du serveur MCP : on l'exécute dans un thread à part.
     path = await asyncio.to_thread(
-        download_tva_excel,
+        download,
         periodicite=periodicite,
         annee=annee,
         periode=periode,
@@ -65,9 +68,9 @@ async def get_indicateurs_tdfc(
     secteur: str | None = None,
     niveau_geo: str = "national",
     territoire: str | None = None,
+    format: str = "excel",
 ) -> str:
-    """Télécharge le fichier Excel des indicateurs TDFC (données fiscales
-    annuelles) d'ImagePME.
+    """Télécharge les indicateurs TDFC (données fiscales annuelles) d'ImagePME.
 
     Args:
         tranche_ca: libellé de la tranche de chiffre d'affaires annuel
@@ -77,12 +80,14 @@ async def get_indicateurs_tdfc(
         secteur: libellé du secteur précis, requis si niveau_sectoriel != "tous".
         niveau_geo: "national" (défaut), "region" ou "departement".
         territoire: nom de la région/du département, requis si niveau_geo != "national".
+        format: "excel" (défaut) ou "pdf".
 
     Returns:
-        Le chemin local du fichier Excel téléchargé.
+        Le chemin local du fichier téléchargé.
     """
+    download = download_tdfc_pdf if format == "pdf" else download_tdfc_excel
     path = await asyncio.to_thread(
-        download_tdfc_excel,
+        download,
         tranche_ca=tranche_ca,
         niveau_sectoriel=niveau_sectoriel,
         secteur=secteur,

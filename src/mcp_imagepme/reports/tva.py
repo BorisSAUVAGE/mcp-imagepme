@@ -40,6 +40,37 @@ _ID_GEO_NIVEAU = "tva_niveau_geographique"
 _ID_GEO_TERRITOIRE = "tva_territoire"
 _ID_SEARCH_BUTTON = "update_tva"
 _ID_DOWNLOAD_EXCEL = "download_tva_excel"
+_ID_DOWNLOAD_PDF = "download_tva_pdf"
+
+
+def _download_tva(
+    download_button_id: str,
+    filename_prefix: str,
+    periodicite: str,
+    annee: str,
+    periode: str,
+    niveau_sectoriel: str,
+    secteur: str | None,
+    niveau_geo: str,
+    territoire: str | None,
+) -> Path:
+    def fill(frame: FrameLocator) -> None:
+        select_radio(frame, "Mensuelle" if periodicite == "mensuelle" else "Trimestrielle")
+        select_dropdown(frame, _ID_SECTEUR_NIVEAU, NIVEAUX_SECTORIELS[niveau_sectoriel])
+        if secteur and niveau_sectoriel != "tous":
+            select_dropdown(frame, _ID_SECTEUR, secteur)
+        select_dropdown(frame, _ID_PERIODE_YEAR, annee)
+        select_dropdown(frame, _ID_PERIODE_MONTH, periode)
+        select_dropdown(frame, _ID_GEO_NIVEAU, NIVEAUX_GEO[niveau_geo])
+        if territoire and niveau_geo != "national":
+            select_dropdown(frame, _ID_GEO_TERRITOIRE, territoire)
+
+    return run_report(
+        fill,
+        search_button_id=_ID_SEARCH_BUTTON,
+        download_button_id=download_button_id,
+        filename_prefix=filename_prefix,
+    )
 
 
 def download_tva_excel(
@@ -61,21 +92,22 @@ def download_tva_excel(
     niveau_geo: une des clés de NIVEAUX_GEO
     territoire: nom de la région/du département (ignoré si niveau_geo == "national")
     """
+    return _download_tva(
+        _ID_DOWNLOAD_EXCEL, "tva", periodicite, annee, periode, niveau_sectoriel, secteur, niveau_geo, territoire
+    )
 
-    def fill(frame: FrameLocator) -> None:
-        select_radio(frame, "Mensuelle" if periodicite == "mensuelle" else "Trimestrielle")
-        select_dropdown(frame, _ID_SECTEUR_NIVEAU, NIVEAUX_SECTORIELS[niveau_sectoriel])
-        if secteur and niveau_sectoriel != "tous":
-            select_dropdown(frame, _ID_SECTEUR, secteur)
-        select_dropdown(frame, _ID_PERIODE_YEAR, annee)
-        select_dropdown(frame, _ID_PERIODE_MONTH, periode)
-        select_dropdown(frame, _ID_GEO_NIVEAU, NIVEAUX_GEO[niveau_geo])
-        if territoire and niveau_geo != "national":
-            select_dropdown(frame, _ID_GEO_TERRITOIRE, territoire)
 
-    return run_report(
-        fill,
-        search_button_id=_ID_SEARCH_BUTTON,
-        download_button_id=_ID_DOWNLOAD_EXCEL,
-        filename_prefix="tva",
+def download_tva_pdf(
+    periodicite: str,
+    annee: str,
+    periode: str,
+    niveau_sectoriel: str = "tous",
+    secteur: str | None = None,
+    niveau_geo: str = "national",
+    territoire: str | None = None,
+) -> Path:
+    """Télécharge le fichier PDF des indicateurs TVA pour les filtres donnés
+    (mêmes paramètres que download_tva_excel)."""
+    return _download_tva(
+        _ID_DOWNLOAD_PDF, "tva", periodicite, annee, periode, niveau_sectoriel, secteur, niveau_geo, territoire
     )

@@ -27,10 +27,38 @@ _ID_GEO_TERRITOIRE = "tdfc_territoire"
 _ID_TAB_BUTTON = "button_tdfc"
 _ID_SEARCH_BUTTON = "update_tdfc"
 _ID_DOWNLOAD_EXCEL = "download_tdfc_excel"
+_ID_DOWNLOAD_PDF = "download_tdfc_pdf"
 
 # Valeur par défaut vue à l'écran ; la liste complète des tranches sera à
 # compléter une fois le dropdown inspecté en direct.
 TRANCHE_CA_TOUTES = "Toutes tranches de CA"
+
+
+def _download_tdfc(
+    download_button_id: str,
+    filename_prefix: str,
+    tranche_ca: str,
+    niveau_sectoriel: str,
+    secteur: str | None,
+    niveau_geo: str,
+    territoire: str | None,
+) -> Path:
+    def fill(frame: FrameLocator) -> None:
+        frame.locator(f"#{_ID_TAB_BUTTON}").click()  # onglet TDFC (TVA actif par défaut)
+        select_dropdown(frame, _ID_SECTEUR_NIVEAU, NIVEAUX_SECTORIELS[niveau_sectoriel])
+        if secteur and niveau_sectoriel != "tous":
+            select_dropdown(frame, _ID_SECTEUR, secteur)
+        select_dropdown(frame, _ID_TRANCHE_CA, tranche_ca)
+        select_dropdown(frame, _ID_GEO_NIVEAU, NIVEAUX_GEO[niveau_geo])
+        if territoire and niveau_geo != "national":
+            select_dropdown(frame, _ID_GEO_TERRITOIRE, territoire)
+
+    return run_report(
+        fill,
+        search_button_id=_ID_SEARCH_BUTTON,
+        download_button_id=download_button_id,
+        filename_prefix=filename_prefix,
+    )
 
 
 def download_tdfc_excel(
@@ -48,20 +76,16 @@ def download_tdfc_excel(
     niveau_geo: une des clés de NIVEAUX_GEO (cf. reports.tva)
     territoire: nom de la région/du département (ignoré si niveau_geo == "national")
     """
+    return _download_tdfc(_ID_DOWNLOAD_EXCEL, "tdfc", tranche_ca, niveau_sectoriel, secteur, niveau_geo, territoire)
 
-    def fill(frame: FrameLocator) -> None:
-        frame.locator(f"#{_ID_TAB_BUTTON}").click()  # onglet TDFC (TVA actif par défaut)
-        select_dropdown(frame, _ID_SECTEUR_NIVEAU, NIVEAUX_SECTORIELS[niveau_sectoriel])
-        if secteur and niveau_sectoriel != "tous":
-            select_dropdown(frame, _ID_SECTEUR, secteur)
-        select_dropdown(frame, _ID_TRANCHE_CA, tranche_ca)
-        select_dropdown(frame, _ID_GEO_NIVEAU, NIVEAUX_GEO[niveau_geo])
-        if territoire and niveau_geo != "national":
-            select_dropdown(frame, _ID_GEO_TERRITOIRE, territoire)
 
-    return run_report(
-        fill,
-        search_button_id=_ID_SEARCH_BUTTON,
-        download_button_id=_ID_DOWNLOAD_EXCEL,
-        filename_prefix="tdfc",
-    )
+def download_tdfc_pdf(
+    tranche_ca: str = TRANCHE_CA_TOUTES,
+    niveau_sectoriel: str = "tous",
+    secteur: str | None = None,
+    niveau_geo: str = "national",
+    territoire: str | None = None,
+) -> Path:
+    """Télécharge le fichier PDF des indicateurs TDFC pour les filtres donnés
+    (mêmes paramètres que download_tdfc_excel)."""
+    return _download_tdfc(_ID_DOWNLOAD_PDF, "tdfc", tranche_ca, niveau_sectoriel, secteur, niveau_geo, territoire)

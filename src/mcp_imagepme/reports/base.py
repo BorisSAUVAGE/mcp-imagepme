@@ -19,6 +19,15 @@ from ..dash_form import get_dash_iframe
 
 FillFn = Callable[[FrameLocator], None]
 
+# Message affiché par ImagePME (et aucun bouton de téléchargement rendu)
+# quand la requête porte sur un échantillon trop petit pour être publié.
+_SECRET_STATISTIQUE_MARKER = "secret statistique"
+
+
+class EchantillonInsuffisantError(RuntimeError):
+    """Levée quand ImagePME refuse d'afficher un résultat (secret statistique :
+    échantillon inférieur à 10 entreprises pour les filtres demandés)."""
+
 
 def run_report(
     fill: FillFn,
@@ -44,8 +53,27 @@ def run_report(
             fill(frame)
             frame.locator(f"#{search_button_id}").click()
 
+            # Quand l'échantillon est trop petit, ImagePME affiche un
+            # avertissement et ne rend aucun bouton de téléchargement : sans
+            # ce contrôle, on attendrait bêtement 30s avant un timeout peu
+            # explicite. On attend l'un ou l'autre des deux dénouements
+            # possibles plutôt que de cliquer en aveugle.
+            download_button = frame.locator(f"#{download_button_id}")
+            warning = frame.get_by_text(_SECRET_STATISTIQUE_MARKER, exact=False)
+            try:
+                download_button.or_(warning).first.wait_for(timeout=15_000)
+            except Exception:
+                pass  # on retombe sur le comportement par défaut ci-dessous
+
+            if warning.count() > 0:
+                raise EchantillonInsuffisantError(
+                    "ImagePME ne peut pas afficher de résultat pour ces filtres : "
+                    "l'échantillon est inférieur à 10 entreprises (secret statistique). "
+                    "Essaie un niveau géographique ou sectoriel plus large."
+                )
+
             with page.expect_download() as download_info:
-                frame.locator(f"#{download_button_id}").click()
+                download_button.click()
             download = download_info.value
 
             dest = config.DOWNLOAD_DIR / f"{filename_prefix}-{download.suggested_filename}"

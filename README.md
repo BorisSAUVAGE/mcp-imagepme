@@ -84,19 +84,25 @@ Une fois connecté, demande simplement en langage naturel, par exemple :
 
 > Donne-moi les indicateurs TVA de mai 2026, tous secteurs, au national.
 
-> Indicateurs TDFC pour le secteur de la construction en Bretagne.
+> Indicateurs TDFC pour le secteur de la construction en Bretagne, en PDF.
 
-Deux tools sont exposés :
+Deux tools sont exposés, chacun avec un paramètre `format` (`"excel"` par
+défaut, ou `"pdf"`) :
 
 - **`get_indicateurs_tva`** — indicateurs TVA (ICA/ICAC), mensuels ou
   trimestriels : `periodicite`, `annee`, `periode`, `niveau_sectoriel`,
-  `secteur`, `niveau_geo`, `territoire`.
+  `secteur`, `niveau_geo`, `territoire`, `format`.
 - **`get_indicateurs_tdfc`** — indicateurs TDFC (données fiscales
   annuelles) : `tranche_ca`, `niveau_sectoriel`, `secteur`, `niveau_geo`,
-  `territoire`.
+  `territoire`, `format`.
 
-Chaque appel retourne le chemin local du fichier Excel téléchargé (dans
+Chaque appel retourne le chemin local du fichier téléchargé (dans
 `.data/downloads/`).
+
+Si les filtres demandés portent sur un échantillon trop restreint, ImagePME
+refuse d'afficher un résultat (secret statistique, en général moins de 10
+entreprises) : le tool renvoie alors une erreur explicite plutôt qu'un
+fichier, en te suggérant d'élargir le niveau géographique ou sectoriel.
 
 ## Fonctionnement interne
 
