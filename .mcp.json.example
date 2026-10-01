@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "imagepme": {
+      "command": "/CHEMIN/ABSOLU/VERS/mcp-imagepme/.venv/bin/imagepme-mcp",
+      "args": []
+    }
+  }
+}

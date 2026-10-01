@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.data/
+# Contient un chemin absolu propre à la machine de chacun ; voir
+# .mcp.json.example et le README pour le générer.
+.mcp.json
+*.egg-info/
+
+# Config Claude Code locale (permissions propres à la machine).
+.claude/settings.local.json
+
+# Dumps HTML utilisés pour explorer le formulaire pendant le développement,
+# pas nécessaires au fonctionnement du projet.
+cadre.html
+imagepme.html
