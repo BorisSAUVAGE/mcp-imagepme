@@ -8,8 +8,8 @@ __pycache__/
 .mcp.json
 *.egg-info/
 
-# Config Claude Code locale (permissions propres à la machine).
-.claude/settings.local.json
+# Config/état Claude Code locaux (propres à la machine/session).
+.claude/
 
 # Dumps HTML utilisés pour explorer le formulaire pendant le développement,
 # pas nécessaires au fonctionnement du projet.

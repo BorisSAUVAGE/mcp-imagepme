@@ -18,51 +18,65 @@ compte, et n'utilise que ses propres droits d'accès.
 
 ## Installation
 
-Prérequis : Python 3.10+, [Claude Code](https://claude.com/claude-code) (ou
-un autre client MCP).
+Prérequis : [Python 3.10+](https://www.python.org/downloads/) et
+[Claude Code](https://claude.com/claude-code) (ou un autre client MCP).
+
+### Installation automatique (recommandé)
 
 ```bash
-git clone <url-du-repo> mcp-imagepme
+git clone https://github.com/BorisSAUVAGE/mcp-imagepme
 cd mcp-imagepme
+```
 
+**macOS / Linux :**
+
+```bash
+./install.sh
+```
+
+**Windows (PowerShell) :**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+Le script crée l'environnement virtuel, installe les dépendances et
+Chromium (pour Playwright), te demande tes identifiants Comptexpert (ou
+laisse `.env` à compléter plus tard si tu appuies sur Entrée sans rien
+taper), puis déclare le serveur auprès de Claude Code s'il est détecté dans
+le PATH. Il peut être relancé sans risque (il réutilise ce qui existe déjà).
+
+Redémarre Claude Code (ou reconnecte via `/mcp` dans une session
+interactive) : il te demandera d'approuver le nouveau serveur `imagepme` au
+premier lancement.
+
+### Installation manuelle
+
+<details>
+<summary>Détail des étapes effectuées par le script, si tu préfères les faire toi-même</summary>
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate          # Windows : .venv\Scripts\activate
 
 pip install -e .
 playwright install chromium
-```
 
-### Identifiants
-
-```bash
 cp .env.example .env
-```
+# édite .env et renseigne COMPTEXPERT_USERNAME / COMPTEXPERT_PASSWORD
 
-Édite `.env` et renseigne tes identifiants Comptexpert :
-
-```
-COMPTEXPERT_USERNAME=ton.email@exemple.fr
-COMPTEXPERT_PASSWORD=ton_mot_de_passe
+claude mcp add imagepme -- "$(pwd)/.venv/bin/imagepme-mcp"
 ```
 
 `.env` n'est jamais commité (voir `.gitignore`) et n'est lu que localement
 par le serveur pour se connecter en ton nom.
 
-### Déclarer le serveur auprès de Claude Code
+Si `claude mcp add` ne fonctionne pas : copie `.mcp.json.example` en
+`.mcp.json` à la racine du projet et remplace le chemin par le chemin
+absolu réel de `.venv/bin/imagepme-mcp` (ou `.venv\Scripts\imagepme-mcp.exe`
+sur Windows) sur ta machine.
 
-Avec le venv activé (pour que le chemin se résolve automatiquement) :
-
-```bash
-claude mcp add imagepme -- "$(pwd)/.venv/bin/imagepme-mcp"
-```
-
-Ou manuellement : copie `.mcp.json.example` en `.mcp.json` à la racine du
-projet et remplace le chemin par le chemin absolu réel de
-`.venv/bin/imagepme-mcp` sur ta machine.
-
-Redémarre Claude Code (ou reconnecte le serveur via `/mcp` dans une session
-interactive) : il te demandera d'approuver le nouveau serveur `imagepme` au
-premier lancement.
+</details>
 
 ## Utilisation
 
