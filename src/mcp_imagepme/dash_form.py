@@ -22,6 +22,12 @@ class OptionNotFoundError(ValueError):
     """Levée quand aucune option d'un dropdown ne correspond au texte fourni."""
 
 
+class AmbiguousOptionError(ValueError):
+    """Levée quand plusieurs options correspondent au texte fourni et qu'aucune
+    n'est une correspondance exacte : on refuse de choisir à la place de
+    l'appelant (ex. "Boulangerie" couvre 10.71B et 10.71C)."""
+
+
 def _search_candidates(option_text: str) -> list[str]:
     """Variantes à essayer successivement pour `option_text`, de la plus
     fidèle à la plus permissive. Couvre les erreurs de format les plus
@@ -75,9 +81,28 @@ def select_dropdown(frame: FrameLocator, dropdown_id: str, option_text: str) -> 
     for candidate in _search_candidates(option_text):
         search_input.fill(candidate)
         option.or_(no_results).first.wait_for(timeout=10_000)
-        if option.count() > 0:
+        # Laisse le filtre finir de s'appliquer : sans ça on pourrait lire
+        # l'ancienne liste non filtrée et conclure à tort à une ambiguïté.
+        menu.evaluate("() => new Promise(resolve => setTimeout(resolve, 150))")
+
+        count = option.count()
+        if count == 0:
+            continue
+        if count == 1:
             option.first.click()
             return
+
+        labels = [label.strip() for label in option.all_inner_texts()]
+        wanted = candidate.strip().casefold()
+        exact = [i for i, label in enumerate(labels) if label.casefold() == wanted]
+        if len(exact) == 1:
+            option.nth(exact[0]).click()
+            return
+        raise AmbiguousOptionError(
+            f"{option_text!r} correspond à plusieurs options du dropdown #{dropdown_id} : "
+            + " ; ".join(labels)
+            + ". Précise avec le code ou le libellé complet de l'option voulue."
+        )
 
     raise OptionNotFoundError(
         f"Aucune option ne correspond à {option_text!r} dans le dropdown #{dropdown_id}. "

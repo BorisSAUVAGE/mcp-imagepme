@@ -8,6 +8,8 @@ dans reports/<nom>.py et l'appeler via `run_report`.
 
 from __future__ import annotations
 
+import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
@@ -76,7 +78,12 @@ def run_report(
                 download_button.click()
             download = download_info.value
 
-            dest = config.DOWNLOAD_DIR / f"{filename_prefix}-{download.suggested_filename}"
+            # Le nom proposé par le site ne contient que la date : deux requêtes
+            # le même jour s'écraseraient. Horodatage + suffixe aléatoire (au cas
+            # où deux appels partent dans la même seconde).
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            suffix = Path(download.suggested_filename).suffix
+            dest = config.DOWNLOAD_DIR / f"{filename_prefix}-{stamp}-{uuid.uuid4().hex[:6]}{suffix}"
             download.save_as(dest)
             return dest
         finally:

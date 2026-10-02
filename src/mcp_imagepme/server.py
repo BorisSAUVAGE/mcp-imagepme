@@ -38,8 +38,11 @@ async def get_indicateurs_tva(
         niveau_sectoriel: "ape", "classe", "groupe", "division", "section"
             ou "tous" (défaut).
         secteur: secteur précis, requis si niveau_sectoriel != "tous". Pas
-            besoin du libellé exact du site : un mot-clé ("Boulangerie"), un
-            code NAF ("10.71C") ou un libellé complet fonctionnent tous.
+            besoin du libellé exact du site : un code NAF ("10.71C"), un
+            mot-clé ou un libellé complet fonctionnent. Si le mot-clé
+            correspond à plusieurs options (ex. "Boulangerie" couvre 10.71B
+            et 10.71C), une erreur liste les options : précise alors avec
+            le code de celle voulue.
         niveau_geo: "national" (défaut), "region" ou "departement".
         territoire: nom de la région/du département (ex. "Bretagne"),
             requis si niveau_geo != "national". Mêmes tolérances que secteur.
@@ -87,8 +90,11 @@ async def get_indicateurs_tdfc(
         niveau_sectoriel: "ape", "classe", "groupe", "division", "section"
             ou "tous" (défaut).
         secteur: secteur précis, requis si niveau_sectoriel != "tous". Pas
-            besoin du libellé exact du site : un mot-clé ("Boulangerie"), un
-            code NAF ("10.71C") ou un libellé complet fonctionnent tous.
+            besoin du libellé exact du site : un code NAF ("10.71C"), un
+            mot-clé ou un libellé complet fonctionnent. Si le mot-clé
+            correspond à plusieurs options (ex. "Boulangerie" couvre 10.71B
+            et 10.71C), une erreur liste les options : précise alors avec
+            le code de celle voulue.
         niveau_geo: "national" (défaut), "region" ou "departement".
         territoire: nom de la région/du département (ex. "Bretagne"),
             requis si niveau_geo != "national". Mêmes tolérances que secteur.
