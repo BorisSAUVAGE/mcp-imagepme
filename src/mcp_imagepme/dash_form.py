@@ -56,6 +56,14 @@ def select_dropdown(frame: FrameLocator, dropdown_id: str, option_text: str) -> 
     à la casse, avec quelques repêchages automatiques (cf. _search_candidates)
     pour les formats de code approximatifs.
     """
+    # Un dropdown dépendant d'un autre (ex. le mois dépend de l'année, le
+    # secteur précis dépend du niveau sectoriel) passe par un état de
+    # chargement (`data-dash-is-loading="true"`) pendant que Dash recalcule
+    # ses options côté serveur ; ses options sont vides tant que ça dure.
+    # Si on interagit trop tôt, on tape dans un champ qui n'a pas encore
+    # reçu sa vraie liste d'options.
+    frame.locator(f"#{dropdown_id}[data-dash-is-loading='true']").wait_for(state="detached", timeout=15_000)
+
     control = frame.locator(f"#{dropdown_id}")
     control.click()
     search_input = frame.locator(f"#{dropdown_id} input[role='combobox']")
