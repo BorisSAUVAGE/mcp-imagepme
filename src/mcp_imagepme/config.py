@@ -3,9 +3,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# Chemin explicite : Claude lance le serveur depuis un autre dossier courant.
+load_dotenv(PROJECT_ROOT / ".env")
 DATA_DIR = PROJECT_ROOT / ".data"
 DOWNLOAD_DIR = DATA_DIR / "downloads"
 STORAGE_STATE_PATH = DATA_DIR / "storage_state.json"

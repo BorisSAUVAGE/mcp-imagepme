@@ -16,39 +16,44 @@ connexion au portail de l'Ordre des experts-comptables). Ce projet ne
 fournit aucun accès aux données — chaque utilisateur doit avoir son propre
 compte, et n'utilise que ses propres droits d'accès.
 
-## Installation
+## Installation (sans terminal)
 
-Prérequis : [Python 3.10+](https://www.python.org/downloads/) et
-[Claude Code](https://claude.com/claude-code) (ou un autre client MCP).
+Prérequis : [Python 3.10+](https://www.python.org/downloads/) (sous
+Windows, l'installeur l'installe tout seul s'il manque) et l'application
+[Claude](https://claude.ai/download).
 
-### Installation automatique (recommandé)
+1. Télécharge le projet : bouton vert **Code → Download ZIP** sur
+   [la page GitHub](https://github.com/BorisSAUVAGE/mcp-imagepme), puis
+   décompresse-le dans ton dossier personnel (pas dans Téléchargements).
+2. Double-clique sur l'installeur :
+   - **Windows** : `Installer.bat` (si Windows affiche « Windows a protégé
+     votre ordinateur », clique sur *Informations complémentaires → Exécuter
+     quand même*) ;
+   - **macOS** : `Installer.command` (la première fois, clic droit →
+     *Ouvrir*, puis confirmer).
+3. Une fenêtre s'ouvre : saisis ton email et ton mot de passe Comptexpert,
+   coche où activer ImagePME (Claude, Claude Code), puis **Enregistrer**.
+4. Quitte complètement Claude et relance-le.
 
-```bash
-git clone https://github.com/BorisSAUVAGE/mcp-imagepme
-cd mcp-imagepme
+Pour changer d'identifiants plus tard : `Configurer.bat` / `Configurer.command`.
+
+### Mise à jour
+
+Double-clique sur `Mettre a jour.bat` (Windows) ou `Mettre a jour.command`
+(macOS), puis relance Claude. Tes identifiants sont conservés.
+
+### Faire installer ImagePME par Claude
+
+Dans Claude Code, colle ce texte (aussi disponible via le bouton
+*Prompt d'installation…* de la fenêtre de configuration) :
+
+```text
+Installe pour moi le serveur MCP ImagePME depuis https://github.com/BorisSAUVAGE/mcp-imagepme :
+1. Télécharge le dépôt (git clone, ou l'archive ZIP de la branche main si git est absent) dans un dossier "mcp-imagepme" de mon dossier personnel.
+2. Lance le script d'installation : install.sh sur macOS/Linux, install.ps1 (powershell -ExecutionPolicy Bypass -File install.ps1) sur Windows. Si Python 3.10+ manque, dis-moi comment l'installer.
+3. Une fenêtre va s'ouvrir pour que je saisisse moi-même mes identifiants Comptexpert : ne me les demande jamais dans la conversation.
+4. Vérifie ensuite que le serveur "imagepme" est bien déclaré dans la configuration de Claude Desktop (claude_desktop_config.json, clé mcpServers) et dans Claude Code (claude mcp get imagepme), puis dis-moi de redémarrer Claude.
 ```
-
-**macOS / Linux :**
-
-```bash
-./install.sh
-```
-
-**Windows (PowerShell) :**
-
-```powershell
-powershell -ExecutionPolicy Bypass -File install.ps1
-```
-
-Le script crée l'environnement virtuel, installe les dépendances et
-Chromium (pour Playwright), te demande tes identifiants Comptexpert (ou
-laisse `.env` à compléter plus tard si tu appuies sur Entrée sans rien
-taper), puis déclare le serveur auprès de Claude Code s'il est détecté dans
-le PATH. Il peut être relancé sans risque (il réutilise ce qui existe déjà).
-
-Redémarre Claude Code (ou reconnecte via `/mcp` dans une session
-interactive) : il te demandera d'approuver le nouveau serveur `imagepme` au
-premier lancement.
 
 ### Installation manuelle
 
