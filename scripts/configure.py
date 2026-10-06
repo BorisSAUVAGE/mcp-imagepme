@@ -25,11 +25,11 @@ IS_WINDOWS = platform.system() == "Windows"
 SERVER_EXE = PROJECT_ROOT / ".venv" / ("Scripts/imagepme-mcp.exe" if IS_WINDOWS else "bin/imagepme-mcp")
 
 INSTALL_PROMPT = f"""\
-Installe pour moi le serveur MCP ImagePME depuis {REPO_URL} :
-1. Télécharge le dépôt (git clone, ou l'archive ZIP de la branche main si git est absent) dans un dossier "mcp-imagepme" de mon dossier personnel.
-2. Lance le script d'installation : install.sh sur macOS/Linux, install.ps1 (powershell -ExecutionPolicy Bypass -File install.ps1) sur Windows. Si Python 3.10+ manque, dis-moi comment l'installer.
+Installe pour moi le serveur MCP ImagePME ({REPO_URL}).
+1. Demande-moi d'abord si j'ai déjà téléchargé le projet et, si oui, dans quel dossier. Sinon, télécharge-le (git clone, ou l'archive ZIP de la branche main si git est absent) dans un dossier "mcp-imagepme" de mon dossier personnel.
+2. Si ce dossier contient déjà une installation (.venv/bin/imagepme-mcp sur macOS/Linux, .venv\\Scripts\\imagepme-mcp.exe sur Windows), ne réinstalle rien : lance seulement la fenêtre de configuration avec le Python de .venv (scripts/configure.py). Sinon, lance le script d'installation : install.sh sur macOS/Linux, install.ps1 (powershell -ExecutionPolicy Bypass -File install.ps1) sur Windows. Si Python 3.10+ manque, dis-moi comment l'installer.
 3. Une fenêtre va s'ouvrir pour que je saisisse moi-même mes identifiants Comptexpert : ne me les demande jamais dans la conversation.
-4. Vérifie ensuite que le serveur "{SERVER_NAME}" est bien déclaré dans la configuration de Claude Desktop (claude_desktop_config.json, clé mcpServers) et dans Claude Code (claude mcp get {SERVER_NAME}), puis dis-moi de redémarrer Claude.
+4. Vérifie ensuite que le serveur "{SERVER_NAME}" est bien déclaré dans la configuration de Claude Desktop (claude_desktop_config.json, clé mcpServers) et dans Claude Code (claude mcp get {SERVER_NAME}), puis dis-moi de quitter complètement Claude et de le relancer.
 """
 
 
@@ -176,24 +176,6 @@ def run_gui() -> None:
     ttk.Checkbutton(frame, text="Claude Code" + ("" if has_cli else " (non détecté)"), variable=code_var,
                     state="normal" if has_cli else "disabled").grid(row=7, columnspan=2, sticky="w")
 
-    def show_prompt() -> None:
-        win = tk.Toplevel(root)
-        win.title("Installer avec l'aide de Claude")
-        ttk.Label(win, text="Pour installer ImagePME sur un autre poste, colle ce texte dans Claude Code :",
-                  padding=10).pack(anchor="w")
-        text = tk.Text(win, width=80, height=12, wrap="word")
-        text.insert("1.0", INSTALL_PROMPT)
-        text.config(state="disabled")
-        text.pack(padx=10)
-
-        def copy() -> None:
-            root.clipboard_clear()
-            root.clipboard_append(INSTALL_PROMPT)
-            copy_btn.config(text="Copié ✓")
-
-        copy_btn = ttk.Button(win, text="Copier", command=copy)
-        copy_btn.pack(pady=10)
-
     def save() -> None:
         user, pwd = user_var.get().strip(), pass_var.get()
         if not user or not pwd:
@@ -209,7 +191,6 @@ def run_gui() -> None:
 
     buttons = ttk.Frame(frame)
     buttons.grid(row=8, columnspan=2, pady=(18, 0), sticky="ew")
-    ttk.Button(buttons, text="Prompt d'installation…", command=show_prompt).pack(side="left")
     ttk.Button(buttons, text="Enregistrer", command=save).pack(side="right")
     ttk.Button(buttons, text="Annuler", command=root.destroy).pack(side="right", padx=6)
 

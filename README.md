@@ -42,17 +42,18 @@ Pour changer d'identifiants plus tard : `Configurer.bat` / `Configurer.command`.
 Double-clique sur `Mettre a jour.bat` (Windows) ou `Mettre a jour.command`
 (macOS), puis relance Claude. Tes identifiants sont conservés.
 
-### Faire installer ImagePME par Claude
+### Variante : faire installer ImagePME par Claude
 
-Dans Claude Code, colle ce texte (aussi disponible via le bouton
-*Prompt d'installation…* de la fenêtre de configuration) :
+Au lieu des étapes 1 à 3 ci-dessus, tu peux coller ce texte dans Claude
+Code. Si tu as déjà téléchargé ou installé le projet, Claude le réutilise
+au lieu de tout réinstaller :
 
 ```text
-Installe pour moi le serveur MCP ImagePME depuis https://github.com/BorisSAUVAGE/mcp-imagepme :
-1. Télécharge le dépôt (git clone, ou l'archive ZIP de la branche main si git est absent) dans un dossier "mcp-imagepme" de mon dossier personnel.
-2. Lance le script d'installation : install.sh sur macOS/Linux, install.ps1 (powershell -ExecutionPolicy Bypass -File install.ps1) sur Windows. Si Python 3.10+ manque, dis-moi comment l'installer.
+Installe pour moi le serveur MCP ImagePME (https://github.com/BorisSAUVAGE/mcp-imagepme).
+1. Demande-moi d'abord si j'ai déjà téléchargé le projet et, si oui, dans quel dossier. Sinon, télécharge-le (git clone, ou l'archive ZIP de la branche main si git est absent) dans un dossier "mcp-imagepme" de mon dossier personnel.
+2. Si ce dossier contient déjà une installation (.venv/bin/imagepme-mcp sur macOS/Linux, .venv\Scripts\imagepme-mcp.exe sur Windows), ne réinstalle rien : lance seulement la fenêtre de configuration avec le Python de .venv (scripts/configure.py). Sinon, lance le script d'installation : install.sh sur macOS/Linux, install.ps1 (powershell -ExecutionPolicy Bypass -File install.ps1) sur Windows. Si Python 3.10+ manque, dis-moi comment l'installer.
 3. Une fenêtre va s'ouvrir pour que je saisisse moi-même mes identifiants Comptexpert : ne me les demande jamais dans la conversation.
-4. Vérifie ensuite que le serveur "imagepme" est bien déclaré dans la configuration de Claude Desktop (claude_desktop_config.json, clé mcpServers) et dans Claude Code (claude mcp get imagepme), puis dis-moi de redémarrer Claude.
+4. Vérifie ensuite que le serveur "imagepme" est bien déclaré dans la configuration de Claude Desktop (claude_desktop_config.json, clé mcpServers) et dans Claude Code (claude mcp get imagepme), puis dis-moi de quitter complètement Claude et de le relancer.
 ```
 
 ### Installation manuelle
