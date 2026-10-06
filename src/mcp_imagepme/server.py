@@ -11,6 +11,7 @@ import asyncio
 
 from mcp.server.fastmcp import FastMCP
 
+from .reports.tableau import tableau_tva
 from .reports.tdfc import TRANCHE_CA_TOUTES, download_tdfc_excel, download_tdfc_pdf
 from .reports.tva import download_tva_excel, download_tva_pdf
 
@@ -28,7 +29,18 @@ async def get_indicateurs_tva(
     territoire: str | None = None,
     format: str = "excel",
 ) -> str:
-    """Télécharge les indicateurs TVA (ICA/ICAC) d'ImagePME.
+    """Indicateurs TVA (ICA/ICAC) d'ImagePME : variation du chiffre d'affaires.
+
+    IMPORTANT — une seule requête suffit pour une série : chaque requête
+    renvoie l'historique qui précède la période demandée (environ 12 mois en
+    mensuel, juillet et août étant regroupés en "07+08" ; environ 11
+    trimestres en trimestriel). Pour l'évolution sur plusieurs mois ou
+    trimestres, interroge UNIQUEMENT la période la plus récente voulue, puis
+    lis l'historique dans le tableau renvoyé. Ne fais pas une requête par
+    période (chaque requête prend environ une minute).
+
+    ICA = variation du CA par rapport à la même période de l'année
+    précédente ; ICAC = même chose en cumul depuis le début de l'année.
 
     Args:
         periodicite: "mensuelle" ou "trimestrielle".
@@ -49,7 +61,8 @@ async def get_indicateurs_tva(
         format: "excel" (défaut) ou "pdf".
 
     Returns:
-        Le chemin local du fichier téléchargé.
+        Le chemin local du fichier téléchargé et, en Excel, le tableau des
+        données (une ligne par période : échantillon, ICA, ICAC).
 
     Raises:
         Une erreur explicite si le secteur/territoire ne correspond à aucune
@@ -70,7 +83,13 @@ async def get_indicateurs_tva(
         niveau_geo=niveau_geo,
         territoire=territoire,
     )
-    return str(path)
+    if format == "pdf":
+        return str(path)
+    try:
+        tableau = await asyncio.to_thread(tableau_tva, path)
+    except Exception:  # noqa: BLE001 — le fichier reste utilisable
+        tableau = None
+    return f"Fichier : {path}\n\n{tableau}" if tableau else str(path)
 
 
 @mcp.tool()

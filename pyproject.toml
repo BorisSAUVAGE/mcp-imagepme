@@ -1,11 +1,12 @@
 [project]
 name = "mcp-imagepme"
-version = "0.1.1"
+version = "0.2.0"
 description = "Serveur MCP pour interroger les données ImagePME (Ordre des experts-comptables) par automatisation du formulaire (RPA / Playwright)."
 license = "MIT"
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]>=1.2.0,<2",
+    "openpyxl>=3.1",
     "playwright>=1.45.0",
     "python-dotenv>=1.0.1",
 ]
