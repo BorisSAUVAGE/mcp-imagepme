@@ -11,7 +11,7 @@ import asyncio
 
 from mcp.server.fastmcp import FastMCP
 
-from .reports.tableau import tableau_tva
+from .reports.tableau import tableau_tdfc, tableau_tva
 from .reports.tdfc import TRANCHE_CA_TOUTES, download_tdfc_excel, download_tdfc_pdf
 from .reports.tva import download_tva_excel, download_tva_pdf
 
@@ -120,7 +120,10 @@ async def get_indicateurs_tdfc(
         format: "excel" (défaut) ou "pdf".
 
     Returns:
-        Le chemin local du fichier téléchargé.
+        Le chemin local du fichier téléchargé et, en Excel, le tableau des
+        données : pour chaque indicateur du compte de résultat et du bilan,
+        montants moyens et médians sur 3 exercices, évolutions, ratios sur
+        CA, part d'entreprises en hausse/baisse et taille de l'échantillon.
 
     Raises:
         Une erreur explicite si le secteur/territoire ne correspond à aucune
@@ -137,7 +140,13 @@ async def get_indicateurs_tdfc(
         niveau_geo=niveau_geo,
         territoire=territoire,
     )
-    return str(path)
+    if format == "pdf":
+        return str(path)
+    try:
+        tableau = await asyncio.to_thread(tableau_tdfc, path)
+    except Exception:  # noqa: BLE001 — le fichier reste utilisable
+        tableau = None
+    return f"Fichier : {path}\n\n{tableau}" if tableau else str(path)
 
 
 def main() -> None:
