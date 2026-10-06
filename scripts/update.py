@@ -62,7 +62,8 @@ def update_zip() -> None:
 def main() -> int:
     before_hash, before_version = pyproject_hash(), version()
     try:
-        if (PROJECT_ROOT / ".git").is_dir() and shutil.which("git"):
+        # Un dossier .git vide (clone avorté) ne compte pas comme un dépôt.
+        if (PROJECT_ROOT / ".git" / "HEAD").is_file() and shutil.which("git"):
             update_git()
         else:
             update_zip()
