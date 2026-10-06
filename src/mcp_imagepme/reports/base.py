@@ -67,7 +67,15 @@ def run_report(
             except Exception:
                 pass  # on retombe sur le comportement par défaut ci-dessous
 
-            if warning.count() > 0:
+            # Le tableau TDFC contient la légende "*S = Secret statistique" :
+            # le texte seul ne prouve donc pas un refus. Seule l'absence du
+            # bouton de téléchargement le confirme.
+            if download_button.count() == 0 and warning.count() > 0:
+                try:
+                    download_button.wait_for(state="attached", timeout=3_000)
+                except Exception:
+                    pass
+            if download_button.count() == 0 and warning.count() > 0:
                 raise EchantillonInsuffisantError(
                     "ImagePME ne peut pas afficher de résultat pour ces filtres : "
                     "l'échantillon est inférieur à 10 entreprises (secret statistique). "
