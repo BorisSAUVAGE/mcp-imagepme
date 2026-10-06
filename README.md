@@ -32,7 +32,7 @@ Windows, l'installeur l'installe tout seul s'il manque) et l'application
    - **macOS** : `Installer.command` (la première fois, clic droit →
      *Ouvrir*, puis confirmer).
 3. Une fenêtre s'ouvre : saisis ton identifiant et ton mot de passe Comptexpert,
-   coche où activer ImagePME (Claude, Claude Code), puis **Enregistrer**.
+   coche où activer ImagePME (Claude, Claude Code, Codex d'OpenAI), puis **Enregistrer**.
 4. Quitte complètement Claude et relance-le.
 
 Pour changer d'identifiants plus tard : `Configurer.bat` / `Configurer.command`.

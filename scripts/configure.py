@@ -119,7 +119,60 @@ def register_code() -> None:
         raise RuntimeError(result.stderr.strip() or result.stdout.strip())
 
 
-def apply(username: str, password: str, desktop: bool, code: bool) -> list[str]:
+# --- Codex (OpenAI) ---------------------------------------------------------
+
+CODEX_SECTION = f"[mcp_servers.{SERVER_NAME}]"
+
+
+def codex_config_path() -> Path:
+    return Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "config.toml"
+
+
+def codex_detected() -> bool:
+    return shutil.which("codex") is not None or codex_config_path().parent.is_dir()
+
+
+def _without_codex_section(text: str) -> list[str]:
+    """Lignes de config.toml sans la section [mcp_servers.imagepme] (ni ses
+    sous-tables, ex. [mcp_servers.imagepme.env])."""
+    out, skipping = [], False
+    for line in text.splitlines():
+        header = line.strip()
+        if header.startswith("["):
+            skipping = header == CODEX_SECTION or header.startswith(CODEX_SECTION[:-1] + ".")
+        if not skipping:
+            out.append(line)
+    while out and not out[-1].strip():
+        out.pop()
+    return out
+
+
+def register_codex() -> Path:
+    path = codex_config_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = []
+    if path.exists():
+        shutil.copy2(path, path.with_suffix(".toml.bak"))
+        lines = _without_codex_section(path.read_text(encoding="utf-8"))
+    # Chaîne littérale TOML ('...') : pas d'échappement des \ des chemins Windows.
+    lines += ["", CODEX_SECTION, f"command = '{SERVER_EXE}'", ""]
+    path.write_text("\n".join(lines).lstrip("\n"), encoding="utf-8")
+    return path
+
+
+def unregister_codex() -> bool:
+    path = codex_config_path()
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    if CODEX_SECTION not in text:
+        return False
+    shutil.copy2(path, path.with_suffix(".toml.bak"))
+    path.write_text("\n".join(_without_codex_section(text)) + "\n", encoding="utf-8")
+    return True
+
+
+def apply(username: str, password: str, desktop: bool, code: bool, codex: bool = False) -> list[str]:
     report = []
     if username:
         write_env(username, password)
@@ -136,6 +189,11 @@ def apply(username: str, password: str, desktop: bool, code: bool) -> list[str]:
             report.append("Claude Code configuré.")
         except Exception as e:  # noqa: BLE001
             report.append(f"Échec Claude Code : {e}")
+    if codex:
+        try:
+            report.append(f"Codex configuré ({register_codex()}).")
+        except Exception as e:  # noqa: BLE001
+            report.append(f"Échec Codex : {e}")
     return report
 
 
@@ -176,6 +234,10 @@ def run_gui() -> None:
     code_var = tk.BooleanVar(value=has_cli)
     ttk.Checkbutton(frame, text="Claude Code" + ("" if has_cli else " (non détecté)"), variable=code_var,
                     state="normal" if has_cli else "disabled").grid(row=7, columnspan=2, sticky="w")
+    has_codex = codex_detected()
+    codex_var = tk.BooleanVar(value=has_codex)
+    ttk.Checkbutton(frame, text="Codex (OpenAI)" + ("" if has_codex else " (non détecté)"), variable=codex_var,
+                    state="normal" if has_codex else "disabled").grid(row=8, columnspan=2, sticky="w")
 
     def save() -> None:
         user, pwd = user_var.get().strip(), pass_var.get()
@@ -183,7 +245,7 @@ def run_gui() -> None:
             if not messagebox.askyesno("Identifiants manquants",
                                        "Aucun identifiant saisi. Continuer quand même ?"):
                 return
-        report = apply(user, pwd, desktop_var.get(), code_var.get())
+        report = apply(user, pwd, desktop_var.get(), code_var.get(), codex_var.get())
         report.append("\nQuitte complètement Claude puis relance-le pour activer ImagePME.")
         ok = not any(r.startswith("Échec") for r in report)
         (messagebox.showinfo if ok else messagebox.showwarning)("ImagePME", "\n".join(report))
@@ -191,7 +253,7 @@ def run_gui() -> None:
             root.destroy()
 
     buttons = ttk.Frame(frame)
-    buttons.grid(row=8, columnspan=2, pady=(18, 0), sticky="ew")
+    buttons.grid(row=9, columnspan=2, pady=(18, 0), sticky="ew")
     ttk.Button(buttons, text="Enregistrer", command=save).pack(side="right")
     ttk.Button(buttons, text="Annuler", command=root.destroy).pack(side="right", padx=6)
 
@@ -209,7 +271,7 @@ def run_terminal() -> None:
     print("Identifiants Comptexpert (Entrée pour ignorer) :")
     user = input("  Identifiant : ").strip()
     pwd = getpass.getpass("  Mot de passe : ") if user else ""
-    for line in apply(user, pwd, desktop=True, code=claude_cli() is not None):
+    for line in apply(user, pwd, desktop=True, code=claude_cli() is not None, codex=codex_detected()):
         print(line)
     print("Quitte complètement Claude puis relance-le pour activer ImagePME.")
 

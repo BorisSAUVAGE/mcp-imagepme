@@ -1,4 +1,4 @@
-"""Retire mcp-imagepme de Claude Desktop et de Claude Code.
+"""Retire mcp-imagepme de Claude Desktop, de Claude Code et de Codex.
 
 La suppression du dossier du projet (avec .env et .venv) est faite ensuite
 par Desinstaller.bat / Desinstaller.command, une fois ce script terminé :
@@ -11,7 +11,7 @@ import json
 import shutil
 import subprocess
 
-from configure import PROJECT_ROOT, SERVER_NAME, claude_cli, desktop_config_paths
+from configure import PROJECT_ROOT, SERVER_NAME, claude_cli, desktop_config_paths, unregister_codex
 
 
 def unregister_desktop() -> None:
@@ -48,3 +48,8 @@ if __name__ == "__main__":
     except Exception as e:  # noqa: BLE001
         print(f"Échec Claude Desktop : {e}")
     unregister_code()
+    try:
+        if unregister_codex():
+            print("Retiré de Codex.")
+    except Exception as e:  # noqa: BLE001
+        print(f"Échec Codex : {e}")
