@@ -42,6 +42,12 @@ Pour changer d'identifiants plus tard : `Configurer.bat` / `Configurer.command`.
 Double-clique sur `Mettre a jour.bat` (Windows) ou `Mettre a jour.command`
 (macOS), puis relance Claude. Tes identifiants sont conservés.
 
+### Désinstallation
+
+Quitte complètement Claude, puis double-clique sur `Desinstaller.bat`
+(Windows) ou `Desinstaller.command` (macOS). ImagePME est retiré de Claude
+et le dossier du projet est supprimé, identifiants compris.
+
 ### Variante : faire installer ImagePME par Claude
 
 Au lieu des étapes 1 à 3 ci-dessus, tu peux coller ce texte dans Claude
