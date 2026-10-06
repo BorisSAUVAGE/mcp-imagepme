@@ -51,7 +51,7 @@ et le dossier du projet est supprimé, identifiants compris.
 ### Variante : faire installer ImagePME par Claude
 
 Au lieu des étapes 1 à 3 ci-dessus, tu peux coller ce texte dans
-**Claude Code** (onglet *Code* de l'application Claude). Ça ne fonctionne
+**Claude Code** (onglet *Code* de l'application Claude) ou dans **Codex**. Ça ne fonctionne
 pas dans l'onglet *Chat* ou *Cowork* : Claude y travaille dans un
 environnement isolé qui ne peut pas installer de logiciel sur ton poste.
 
@@ -60,11 +60,11 @@ lieu de tout réinstaller :
 
 ```text
 Installe pour moi le serveur MCP ImagePME (https://github.com/BorisSAUVAGE/mcp-imagepme).
-0. Avant tout, vérifie que tu peux exécuter des commandes directement sur mon ordinateur (pas dans une machine virtuelle ou un environnement Linux isolé) : sous Windows, la commande "powershell -Command $PSVersionTable" doit fonctionner. Si ce n'est pas le cas, ne télécharge rien : dis-moi de coller ce texte dans l'onglet Code de l'application Claude (Claude Code), ou d'utiliser Installer.bat / Installer.command.
+0. Avant tout, vérifie que tu peux exécuter des commandes directement sur mon ordinateur (pas dans une machine virtuelle ou un environnement Linux isolé) : sous Windows, la commande "powershell -Command $PSVersionTable" doit fonctionner. Si ce n'est pas le cas, ne télécharge rien : dis-moi de coller ce texte dans Claude Code (onglet Code de l'application Claude) ou dans Codex, ou d'utiliser Installer.bat / Installer.command.
 1. Demande-moi d'abord si j'ai déjà téléchargé le projet et, si oui, dans quel dossier. Sinon, télécharge-le (git clone, ou l'archive ZIP de la branche main si git est absent) dans un dossier "mcp-imagepme" de mon dossier personnel.
 2. Si ce dossier contient déjà une installation (.venv/bin/imagepme-mcp sur macOS/Linux, .venv\Scripts\imagepme-mcp.exe sur Windows), ne réinstalle rien : lance seulement la fenêtre de configuration avec le Python de .venv (scripts/configure.py). Sinon, lance le script d'installation : install.sh sur macOS/Linux, install.ps1 (powershell -ExecutionPolicy Bypass -File install.ps1) sur Windows. Si Python 3.10+ manque, dis-moi comment l'installer.
 3. Une fenêtre va s'ouvrir pour que je saisisse moi-même mes identifiants Comptexpert : ne me les demande jamais dans la conversation.
-4. Vérifie ensuite que le serveur "imagepme" est bien déclaré dans la configuration de Claude Desktop (claude_desktop_config.json, clé mcpServers) et dans Claude Code (claude mcp get imagepme), puis dis-moi de quitter complètement Claude et de le relancer.
+4. Vérifie ensuite que le serveur "imagepme" est bien déclaré là où je l'ai coché : Claude Desktop (claude_desktop_config.json, clé mcpServers), Claude Code (claude mcp get imagepme), Codex (section [mcp_servers.imagepme] de ~/.codex/config.toml). Dis-moi enfin de quitter complètement et relancer les applications concernées.
 ```
 
 ### Installation manuelle

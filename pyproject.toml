@@ -1,6 +1,6 @@
 [project]
 name = "mcp-imagepme"
-version = "0.4.0"
+version = "0.4.1"
 description = "Serveur MCP pour interroger les données ImagePME (Ordre des experts-comptables) par automatisation du formulaire (RPA / Playwright)."
 license = "MIT"
 requires-python = ">=3.10"
