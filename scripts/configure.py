@@ -158,7 +158,7 @@ def run_gui() -> None:
 
     user_var = tk.StringVar(value=env.get("COMPTEXPERT_USERNAME", ""))
     pass_var = tk.StringVar(value=env.get("COMPTEXPERT_PASSWORD", ""))
-    ttk.Label(frame, text="Email").grid(row=2, column=0, sticky="w")
+    ttk.Label(frame, text="Identifiant").grid(row=2, column=0, sticky="w")
     user_entry = ttk.Entry(frame, textvariable=user_var, width=36)
     user_entry.grid(row=2, column=1, pady=3)
     ttk.Label(frame, text="Mot de passe").grid(row=3, column=0, sticky="w")
@@ -207,7 +207,7 @@ def run_terminal() -> None:
     import getpass
 
     print("Identifiants Comptexpert (Entrée pour ignorer) :")
-    user = input("  Email : ").strip()
+    user = input("  Identifiant : ").strip()
     pwd = getpass.getpass("  Mot de passe : ") if user else ""
     for line in apply(user, pwd, desktop=True, code=claude_cli() is not None):
         print(line)

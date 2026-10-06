@@ -31,7 +31,7 @@ Windows, l'installeur l'installe tout seul s'il manque) et l'application
      quand même*) ;
    - **macOS** : `Installer.command` (la première fois, clic droit →
      *Ouvrir*, puis confirmer).
-3. Une fenêtre s'ouvre : saisis ton email et ton mot de passe Comptexpert,
+3. Une fenêtre s'ouvre : saisis ton identifiant et ton mot de passe Comptexpert,
    coche où activer ImagePME (Claude, Claude Code), puis **Enregistrer**.
 4. Quitte complètement Claude et relance-le.
 
